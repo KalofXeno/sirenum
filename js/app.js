@@ -168,6 +168,7 @@ const map = new ol.Map({
   }),
 });
 basemaps.mola.setVisible(false);
+window.sirenum = { map }; // handle for debugging in the console
 // ---------- Responsive helpers ----------
 const phone = window.matchMedia("(max-width: 760px)");
 

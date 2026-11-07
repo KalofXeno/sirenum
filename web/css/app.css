@@ -137,7 +137,7 @@ kbd { font-family: var(--mono); font-size: 10px; color: var(--c-t3); border: 1px
 /* ---------- Views ---------- */
 .view { display: none; position: fixed; inset: var(--hdr-h) 0 0 0; }
 .view.active { display: block; }
-.map { position: absolute; inset: 0; background: #000; }
+.map { position: absolute; inset: 0; background: var(--c-bg); transition: background .3s var(--ease); }
 
 .card {
   position: absolute; z-index: 10; background: var(--glass);
@@ -171,7 +171,7 @@ kbd { font-family: var(--mono); font-size: 10px; color: var(--c-t3); border: 1px
 .swatch.grid { background: repeating-linear-gradient(90deg, transparent 0 4px, var(--c-t3) 4px 5px); }
 .sub { padding: 2px 4px 4px 30px; }
 .slider { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--c-t3); text-transform: uppercase; letter-spacing: .04em; }
-.slider input { flex: 1; accent-color: var(--c-acc-line); }
+.slider input { flex: 1; min-width: 0; accent-color: var(--c-acc-line); }
 .hint { font-size: 12px; color: var(--c-t2); margin-top: 6px; line-height: 1.45; }
 .hint.warn {
   color: var(--c-t1); background: var(--c-sand-d); border: 1px solid var(--c-sand);

@@ -390,7 +390,10 @@ function wire() {
   };
   $("layers-btn").addEventListener("click", () => setLayers(!$("layers").classList.contains("open")));
   $("layers-close").addEventListener("click", () => setLayers(false));
-  map.on("pointerdown", () => phone.matches && setLayers(false));
+  // Note: OpenLayers stops an event when a listener returns false, so never return a value here.
+  map.on("pointerdown", () => {
+    if (phone.matches) setLayers(false);
+  });
   phone.addEventListener("change", () => { setLayers(false); map.updateSize(); fitInitial(); });
   window.addEventListener("resize", () => map.updateSize());
 

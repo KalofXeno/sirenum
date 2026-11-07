@@ -40,8 +40,8 @@ function trekLayer(layerId, maxZoom, attribution) {
 }
 
 const basemaps = {
-  viking: trekLayer("Viking_MDIM21_ClrMosaic_global_232m", 7, "Viking MDIM 2.1 · USGS/NASA Ames · Mars Trek"),
-  mola: trekLayer("Mars_MGS_MOLA_ClrShade_merge_global_463m", 6, "MGS MOLA shaded relief · Mars Trek"),
+  viking: trekLayer("Mars_Viking_MDIM21_ClrMosaic_global_232m", 7, "Viking MDIM 2.1 · USGS/NASA Ames · Mars Trek"),
+  mola: trekLayer("Mars_MGS_MOLA_ClrShade_merge_global_463m", 7, "MGS MOLA shaded relief · Mars Trek"),
 };
 
 // ---------- MDGM layer ----------

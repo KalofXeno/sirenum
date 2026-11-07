@@ -102,7 +102,7 @@ const siteStyle = (f) =>
   new ol.style.Style({
     image: new ol.style.Circle({
       radius: 4.5,
-      fill: new ol.style.Fill({ color: "#e7c892" }),
+      fill: new ol.style.Fill({ color: "#f0b429" }),
       stroke: new ol.style.Stroke({ color: "#000000", width: 1.5 }),
     }),
     text: new ol.style.Text({
@@ -119,7 +119,7 @@ const regionStyle = (f) =>
     text: new ol.style.Text({
       text: f.get("name").toUpperCase(),
       font: "500 10px IBM Plex Mono, monospace",
-      fill: new ol.style.Fill({ color: "rgba(189,238,251,.9)" }),
+      fill: new ol.style.Fill({ color: "rgba(228,232,240,.85)" }),
       stroke: new ol.style.Stroke({ color: "rgba(0,0,0,.7)", width: 3 }),
       // letter-spacing is not supported by canvas text in all browsers; keep simple
     }),

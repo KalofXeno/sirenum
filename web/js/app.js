@@ -76,14 +76,14 @@ const siteStyle = (f) =>
   new ol.style.Style({
     image: new ol.style.Circle({
       radius: 4.5,
-      fill: new ol.style.Fill({ color: "#f2b36b" }),
-      stroke: new ol.style.Stroke({ color: "#1a0f0a", width: 1.5 }),
+      fill: new ol.style.Fill({ color: "#e7c892" }),
+      stroke: new ol.style.Stroke({ color: "#000000", width: 1.5 }),
     }),
     text: new ol.style.Text({
       text: f.get("name"),
-      font: "500 11px Inter, sans-serif",
+      font: "500 12px Outfit, sans-serif",
       offsetY: -12,
-      fill: new ol.style.Fill({ color: "#f5e6d3" }),
+      fill: new ol.style.Fill({ color: "#ffffff" }),
       stroke: new ol.style.Stroke({ color: "rgba(0,0,0,.8)", width: 3 }),
     }),
   });
@@ -92,8 +92,8 @@ const regionStyle = (f) =>
   new ol.style.Style({
     text: new ol.style.Text({
       text: f.get("name").toUpperCase(),
-      font: "500 10px Inter, sans-serif",
-      fill: new ol.style.Fill({ color: "rgba(231,233,238,.75)" }),
+      font: "500 10px IBM Plex Mono, monospace",
+      fill: new ol.style.Fill({ color: "rgba(189,238,251,.9)" }),
       stroke: new ol.style.Stroke({ color: "rgba(0,0,0,.7)", width: 3 }),
       // letter-spacing is not supported by canvas text in all browsers; keep simple
     }),
@@ -117,8 +117,8 @@ const gridLayer = new ol.layer.Graticule({
   strokeStyle: new ol.style.Stroke({ color: "rgba(255,255,255,0.18)", width: 1 }),
   showLabels: true,
   wrapX: false,
-  lonLabelStyle: new ol.style.Text({ font: "10px JetBrains Mono, monospace", fill: new ol.style.Fill({ color: "#aaa" }), textBaseline: "bottom", stroke: new ol.style.Stroke({ color: "#000", width: 3 }) }),
-  latLabelStyle: new ol.style.Text({ font: "10px JetBrains Mono, monospace", fill: new ol.style.Fill({ color: "#aaa" }), textAlign: "end", stroke: new ol.style.Stroke({ color: "#000", width: 3 }) }),
+  lonLabelStyle: new ol.style.Text({ font: "10px IBM Plex Mono, monospace", fill: new ol.style.Fill({ color: "#aaa" }), textBaseline: "bottom", stroke: new ol.style.Stroke({ color: "#000", width: 3 }) }),
+  latLabelStyle: new ol.style.Text({ font: "10px IBM Plex Mono, monospace", fill: new ol.style.Fill({ color: "#aaa" }), textAlign: "end", stroke: new ol.style.Stroke({ color: "#000", width: 3 }) }),
   lonLabelFormatter: (lon) => fmtLon(lon),
   latLabelFormatter: (lat) => `${Math.abs(lat)}°${lat >= 0 ? "N" : "S"}`,
   visible: false,
@@ -298,9 +298,9 @@ function wire() {
   $("lyr-grid").addEventListener("change", (e) => gridLayer.setVisible(e.target.checked));
   document.querySelectorAll('input[name="base"]').forEach((r) => r.addEventListener("change", () => setBase(r.value)));
 
-  document.querySelectorAll(".seg button").forEach((b) =>
+  document.querySelectorAll(".lon-mode button").forEach((b) =>
     b.addEventListener("click", () => {
-      document.querySelectorAll(".seg button").forEach((x) => x.classList.toggle("active", x === b));
+      document.querySelectorAll(".lon-mode button").forEach((x) => x.classList.toggle("active", x === b));
       state.lonMode = Number(b.dataset.lon);
       gridLayer.changed();
       map.render();
@@ -325,7 +325,17 @@ function wire() {
     setTimeout(() => ($("share").textContent = "Copy link"), 1600);
   });
 
-  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => showView(t.dataset.view)));
+  document.querySelectorAll("[data-view]").forEach((t) => t.addEventListener("click", () => showView(t.dataset.view)));
+
+  $("theme-tog").addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("sirenum-theme", next); } catch {}
+  });
+
+  const tick = () => ($("ts").textContent = new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC");
+  tick();
+  setInterval(tick, 30000);
 
   document.addEventListener("keydown", (e) => {
     if (e.target.matches("input[type=date], select")) return;
@@ -348,7 +358,7 @@ function wire() {
 }
 
 function showView(name) {
-  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === name));
+  document.querySelectorAll("[data-view]").forEach((t) => t.classList.toggle("active", t.dataset.view === name));
   document.querySelectorAll(".view").forEach((v) => v.classList.toggle("active", v.id === `view-${name}`));
   if (name === "map") map.updateSize();
 }
@@ -388,5 +398,8 @@ function showDetails([lon, lat], pixel) {
   const hashDate = readHash();
   if (hashDate) setDate(parseDate(hashDate));
   else if (state.days.length) setDay(state.days.length - 1);
-  else setDate(parseDate(isoDate(new Date())));
+  else {
+    const n = new Date(); // today in the viewer's local calendar
+    setDate(new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())));
+  }
 })();

@@ -395,3 +395,7 @@ html, body { height: 100dvh; overflow: hidden; overscroll-behavior: none; }
   .tl-controls, .tl-date, .tl-track { grid-area: auto; }
   .mars-date .season, .ls-ticks { display: none; }
 }
+@media (max-width: 760px) {
+  .fab { transition: opacity .2s var(--ease); }
+  .fab[aria-expanded="true"] { opacity: 0; pointer-events: none; }
+}

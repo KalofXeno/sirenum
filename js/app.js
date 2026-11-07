@@ -184,7 +184,19 @@ new ResizeObserver(([e]) => {
   document.documentElement.style.setProperty("--tl-h", `${Math.round(e.target.offsetHeight)}px`);
 }).observe(document.querySelector(".timeline"));
 
-map.getView().fit(GLOBAL_EXTENT, { padding: fitPadding() });
+function fitInitial() {
+  const v = map.getView();
+  if (phone.matches) {
+    // Portrait screens: fill the available height and let the user pan east-west.
+    const [t, , btm] = fitPadding();
+    const h = map.getSize()?.[1] || window.innerHeight;
+    v.setResolution(180 / Math.max(200, h - t - btm));
+    v.setCenter([0, 0]);
+  } else {
+    v.fit(GLOBAL_EXTENT, { padding: fitPadding() });
+  }
+}
+fitInitial();
 
 // ---------- Formatting ----------
 function fmtLon(lon) {
@@ -378,7 +390,7 @@ function wire() {
   $("layers-btn").addEventListener("click", () => setLayers(!$("layers").classList.contains("open")));
   $("layers-close").addEventListener("click", () => setLayers(false));
   map.on("pointerdown", () => phone.matches && setLayers(false));
-  phone.addEventListener("change", () => { setLayers(false); map.updateSize(); });
+  phone.addEventListener("change", () => { setLayers(false); map.updateSize(); fitInitial(); });
   window.addEventListener("resize", () => map.updateSize());
 
   $("theme-tog").addEventListener("click", () => {

@@ -269,7 +269,7 @@ async function loadManifest() {
     slider.max = state.days.length - 1;
     slider.disabled = false;
     const a = state.days[0].date, b = state.days.at(-1).date;
-    status.textContent = `${state.days.length} daily maps · ${a} → ${b}`;
+    status.textContent = state.days.length === 1 ? `1 daily map · ${a}` : `${state.days.length} daily maps · ${a} → ${b}`;
     $("date").min = a;
     $("date").max = b;
   } else {

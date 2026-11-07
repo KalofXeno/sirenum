@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "product": "MRO MARCI Mars Daily Global Maps v2 (Wang et al.), 0.1 deg color JPEG",
+  "projection": "Simple cylindrical, planetocentric, east-positive, -180..180",
+  "days": []
+}

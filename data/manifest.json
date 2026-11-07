@@ -16,6 +16,30 @@
    "ls_start": 120.7,
    "tiles": "data/mdgm/tiles/2008-09-01/{z}/{y}/{x}.webp",
    "maxZoom": 3
+  },
+  {
+   "date": "2008-09-02",
+   "my": 29,
+   "ls": 121.4,
+   "width": 3600,
+   "height": 1801,
+   "source_file": "B01_day02.png",
+   "subphase": "B01",
+   "day": 2,
+   "tiles": "data/mdgm/tiles/2008-09-02/{z}/{y}/{x}.webp",
+   "maxZoom": 3
+  },
+  {
+   "date": "2008-09-03",
+   "my": 29,
+   "ls": 121.87,
+   "width": 3600,
+   "height": 1801,
+   "source_file": "B01_day03.png",
+   "subphase": "B01",
+   "day": 3,
+   "tiles": "data/mdgm/tiles/2008-09-03/{z}/{y}/{x}.webp",
+   "maxZoom": 3
   }
  ]
 }

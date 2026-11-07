@@ -45,29 +45,55 @@ const basemaps = {
 };
 
 // ---------- MDGM layer ----------
-const mdgmLayer = new ol.layer.Image({ opacity: 1 });
+// Two layers: tiled days (XYZ pyramid on the Mars Trek EQ grid) and single-image days.
+const MDGM_ATTR = "MARCI MDGM v2 · H. Wang et al. (SAO) · MSSS/NASA";
+const mdgmTileLayer = new ol.layer.Tile({ opacity: 1, preload: 1 });
+const mdgmImageLayer = new ol.layer.Image({ opacity: 1 });
+const mdgmLayers = [mdgmTileLayer, mdgmImageLayer];
 const sourceCache = new Map();
 
 function mdgmSource(day) {
   if (!sourceCache.has(day.date)) {
-    sourceCache.set(
-      day.date,
-      new ol.source.ImageStatic({
-        url: day.url,
-        imageExtent: day.extent || GLOBAL_EXTENT,
-        projection: proj,
-        interpolate: true,
-        attributions: "MARCI MDGM v2 · H. Wang et al. (SAO) · MSSS/NASA",
-      })
-    );
+    const src = day.tiles
+      ? new ol.source.XYZ({
+          projection: proj,
+          tileGrid: trekGrid,
+          maxZoom: day.maxZoom ?? 3,
+          wrapX: false,
+          transition: 0,
+          attributions: MDGM_ATTR,
+          tileUrlFunction: ([z, x, y]) =>
+            day.tiles.replace("{z}", z).replace("{y}", y).replace("{x}", x),
+        })
+      : new ol.source.ImageStatic({
+          url: day.url,
+          imageExtent: day.extent || GLOBAL_EXTENT,
+          projection: proj,
+          interpolate: true,
+          attributions: MDGM_ATTR,
+        });
+    sourceCache.set(day.date, src);
   }
   return sourceCache.get(day.date);
 }
 
+function showDay(day) {
+  const src = mdgmSource(day);
+  mdgmTileLayer.setSource(day.tiles ? src : null);
+  mdgmImageLayer.setSource(day.tiles ? null : src);
+}
+
+// Warm the browser cache for the next few days so playback is smooth.
 function preload(fromIndex, count = 4) {
+  const z = Math.min(2, Math.max(0, Math.round(map.getView().getZoom() ?? 1)));
   for (let i = 1; i <= count; i++) {
     const d = state.days[fromIndex + i];
-    if (d) new Image().src = d.url;
+    if (!d) continue;
+    if (d.tiles) {
+      for (let r = 0; r < 2 ** z; r++)
+        for (let c = 0; c < 2 ** (z + 1); c++)
+          new Image().src = d.tiles.replace("{z}", z).replace("{y}", r).replace("{x}", c);
+    } else if (d.url) new Image().src = d.url;
   }
 }
 
@@ -127,7 +153,7 @@ const gridLayer = new ol.layer.Graticule({
 // ---------- Map ----------
 const map = new ol.Map({
   target: "map",
-  layers: [basemaps.viking, basemaps.mola, mdgmLayer, gridLayer, regionsLayer, sitesLayer],
+  layers: [basemaps.viking, basemaps.mola, ...mdgmLayers, gridLayer, regionsLayer, sitesLayer],
   controls: ol.control.defaults.defaults({ zoom: false, rotate: false, attributionOptions: { collapsible: false } }),
   view: new ol.View({
     projection: proj,
@@ -162,7 +188,7 @@ function setDay(i) {
   state.index = Math.max(0, Math.min(state.days.length - 1, i));
   const day = state.days[state.index];
   state.date = parseDate(day.date);
-  mdgmLayer.setSource(mdgmSource(day));
+  showDay(day);
   preload(state.index);
   $("day-slider").value = state.index;
   updateDateUI();
@@ -291,8 +317,8 @@ function setBase(value) {
 }
 
 function wire() {
-  $("lyr-mdgm").addEventListener("change", (e) => mdgmLayer.setVisible(e.target.checked));
-  $("mdgm-opacity").addEventListener("input", (e) => mdgmLayer.setOpacity(Number(e.target.value)));
+  $("lyr-mdgm").addEventListener("change", (e) => mdgmLayers.forEach((l) => l.setVisible(e.target.checked)));
+  $("mdgm-opacity").addEventListener("input", (e) => mdgmLayers.forEach((l) => l.setOpacity(Number(e.target.value))));
   $("lyr-sites").addEventListener("change", (e) => sitesLayer.setVisible(e.target.checked));
   $("lyr-regions").addEventListener("change", (e) => regionsLayer.setVisible(e.target.checked));
   $("lyr-grid").addEventListener("change", (e) => gridLayer.setVisible(e.target.checked));
@@ -385,7 +411,7 @@ function showDetails([lon, lat], pixel) {
   ];
   if (hit && hit.get("kind") === "site") rows.push(["Landed", `${hit.get("year")} · ${hit.get("agency")}`]);
   if (m) rows.push(["Date", `${isoDate(state.date)}`], ["Mars date", `MY ${m.my} · Ls ${m.ls.toFixed(1)}°`]);
-  rows.push(["Daily map", day ? `${day.subphase ? day.subphase + " · " : ""}${day.date}` : "none"]);
+  rows.push(["Daily map", day ? `${day.subphase ? day.subphase + (day.day ? ` day ${String(day.day).padStart(2, "0")}` : "") + " · " : ""}${day.date}` : "none"]);
   $("details-title").textContent = title;
   $("details-body").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("details").classList.remove("hidden");

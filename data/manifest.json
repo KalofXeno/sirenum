@@ -1,6 +1,21 @@
 {
-  "version": 1,
-  "product": "MRO MARCI Mars Daily Global Maps v2 (Wang et al.), 0.1 deg color JPEG",
-  "projection": "Simple cylindrical, planetocentric, east-positive, -180..180",
-  "days": []
+ "version": 1,
+ "product": "MRO MARCI Mars Daily Global Maps v2 (Wang et al.), 0.1 deg color, tiled WebP (EPSG:4326, Mars Trek EQ grid)",
+ "projection": "Simple cylindrical, planetocentric, east-positive, -180..180",
+ "days": [
+  {
+   "date": "2008-09-01",
+   "my": 29,
+   "ls": 120.93,
+   "width": 3600,
+   "height": 1801,
+   "source_file": "B01_009838_1207_MA_00N315W.png",
+   "subphase": "B01",
+   "day": 1,
+   "orbit": 9838,
+   "ls_start": 120.7,
+   "tiles": "data/mdgm/tiles/2008-09-01/{z}/{y}/{x}.webp",
+   "maxZoom": 3
+  }
+ ]
 }

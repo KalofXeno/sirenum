@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+# raw downloads / ISIS products stay local
+raw/
+*.cub
+*.IMG

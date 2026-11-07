@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sirenum · MARCI Daily Global Maps</title>
+  <script>
+    // Set theme before paint to avoid a flash.
+    (function () {
+      var t;
+      try { t = localStorage.getItem("sirenum-theme"); } catch (e) {}
+      if (!t) t = window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@10.2.1/ol.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css?v=202611062023" />
+</head>
+<body>
+  <header class="hdr">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle class="ring" cx="16" cy="16" r="13" fill="none" stroke-width="1.8" />
+        <path d="M5 13c5 2 9-1 13 1s7 0 9-1M4 19c6 1 9 3 14 1s7-1 10 0" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55" />
+      </svg>
+      <h1>Sirenum</h1>
+      <span class="pill">MARCI MDGM</span>
+    </div>
+    <nav class="vtog" role="tablist">
+      <button class="active" data-view="map" role="tab">Map <kbd>1</kbd></button>
+      <button data-view="about" role="tab">About <kbd>2</kbd></button>
+    </nav>
+    <div class="hdr-right">
+      <span class="ts" id="ts"></span>
+      <button id="share" class="btn" title="Copy a link to this view">Copy link</button>
+      <div class="theme" title="Toggle light / dark">
+        <span>☾</span>
+        <button class="tog" id="theme-tog" aria-label="Toggle light or dark theme"></button>
+        <span>☀︎</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="view-map" class="view active">
+    <aside class="card layers ani ani-1" aria-label="Layers">
+      <div class="card-h"><span class="ico teal">◐</span><h3>Daily</h3></div>
+      <label class="layer">
+        <input type="checkbox" id="lyr-mdgm" checked />
+        <span class="swatch daily"></span>
+        <span class="layer-name">MARCI MDGM v2 (Wang)</span>
+      </label>
+      <div class="sub">
+        <label class="slider">Opacity <input type="range" id="mdgm-opacity" min="0" max="1" step="0.05" value="1" /></label>
+        <div id="mdgm-status" class="hint"></div>
+      </div>
+
+      <div class="card-h"><span class="ico sand">▦</span><h3>Basemap</h3></div>
+      <label class="layer"><input type="radio" name="base" value="viking" checked /><span class="swatch viking"></span><span class="layer-name">Viking MDIM 2.1 color</span></label>
+      <label class="layer"><input type="radio" name="base" value="mola" /><span class="swatch mola"></span><span class="layer-name">MOLA color shaded relief</span></label>
+      <label class="layer"><input type="radio" name="base" value="none" /><span class="swatch none"></span><span class="layer-name">None</span></label>
+
+      <div class="card-h"><span class="ico sky">◎</span><h3>Overlays</h3></div>
+      <label class="layer"><input type="checkbox" id="lyr-sites" checked /><span class="swatch sites"></span><span class="layer-name">Landing sites</span></label>
+      <label class="layer"><input type="checkbox" id="lyr-regions" checked /><span class="swatch regions"></span><span class="layer-name">Region names</span></label>
+      <label class="layer"><input type="checkbox" id="lyr-grid" /><span class="swatch grid"></span><span class="layer-name">Lat / lon grid</span></label>
+
+      <div class="card-h"><span class="ico teal">⇄</span><h3>Longitude</h3></div>
+      <div class="vtog full lon-mode">
+        <button data-lon="180" class="active">−180…180 E</button>
+        <button data-lon="360">0…360 E</button>
+      </div>
+    </aside>
+
+    <div id="map" class="map"></div>
+    <div class="map-hint">Scroll to zoom · drag to pan · click for details · ← → step days · space to play</div>
+    <div id="cursor" class="cursor-readout"></div>
+
+    <aside id="details" class="card details hidden" aria-label="Location details">
+      <button class="close" id="details-close" aria-label="Close">×</button>
+      <h2 id="details-title">Location</h2>
+      <dl id="details-body"></dl>
+    </aside>
+
+    <footer class="timeline card ani ani-2">
+      <div class="tl-controls">
+        <button id="prev" title="Previous day (←)">‹</button>
+        <button id="play" title="Play (space)" class="play">▶</button>
+        <button id="next" title="Next day (→)">›</button>
+        <select id="speed" title="Playback speed">
+          <option value="1000">1 day/s</option>
+          <option value="400" selected>2.5 day/s</option>
+          <option value="150">~7 day/s</option>
+        </select>
+      </div>
+      <div class="tl-date">
+        <input type="date" id="date" />
+        <div class="mars-date">
+          <span id="md-my" class="stag teal">MY –</span>
+          <span id="md-ls" class="stag sand">Ls –</span>
+          <span id="md-season" class="season"></span>
+        </div>
+      </div>
+      <div class="tl-track">
+        <div class="ls-strip" id="ls-strip" title="Solar longitude across the Mars year. Ticks mark available daily maps; the shaded half is dust season.">
+          <div class="dust"></div>
+          <div class="ls-ticks"><span>0°</span><span>90°</span><span>180°</span><span>270°</span><span>360°</span></div>
+          <div class="ls-avail" id="ls-avail"></div>
+          <div class="ls-marker" id="ls-marker"></div>
+        </div>
+        <input type="range" id="day-slider" min="0" max="0" value="0" />
+      </div>
+    </footer>
+  </main>
+
+  <main id="view-about" class="view about">
+    <div class="shell">
+      <article class="card doc ani">
+        <h1>MARCI Daily Global Maps</h1>
+        <p>
+          This viewer shows Mars Daily Global Maps (MDGMs) built from Mars Reconnaissance Orbiter
+          Mars Color Imager (MARCI) wide-angle swaths. Each map is composed from 13 consecutive
+          global swaths covering roughly one sol, on a simple cylindrical grid (90°S–90°N, 180°W–180°E).
+        </p>
+        <h2>Data</h2>
+        <ul>
+          <li><strong>Phase 1:</strong> Wang, H. et al., MRO MARCI MDGMs Version 2, 0.1° color JPEGs —
+            <a href="https://doi.org/10.7910/DVN/U3766S" target="_blank" rel="noopener">Harvard Dataverse doi:10.7910/DVN/U3766S</a>;
+            full archive at the <a href="https://astrogeology.usgs.gov/search/map/mars_mro_marci_daily_global_weather_maps_pds4_archive" target="_blank" rel="noopener">PDS Imaging Node Annex</a>.</li>
+          <li><strong>Phase 2:</strong> Full-resolution MDGMs processed from MARCI EDRs with ISIS
+            (marci2isis → spiceinit → marcical → photomet → cam2map → mosaic), served as tiles.</li>
+          <li>Basemaps: Viking MDIM 2.1 colorized mosaic and MGS MOLA color shaded relief, via NASA Mars Trek WMTS.</li>
+        </ul>
+        <h2>Mars calendar</h2>
+        <p>
+          Solar longitude (L<sub>s</sub>) and Mars Sol Date follow Allison &amp; McEwen (2000), the Mars24 algorithm.
+          Mars Year numbering follows Clancy et al. (2000), where MY 1 begins 1955-04-11. The shaded band on the
+          timeline marks the dust storm season (L<sub>s</sub> 180°–360°).
+        </p>
+        <h2>Coordinates</h2>
+        <p>Planetocentric latitude and east-positive longitude. Distances use a sphere of radius 3396.19 km.</p>
+      </article>
+      <div class="foot">Sirenum · <a href="https://github.com/KalofXeno/sirenum" target="_blank" rel="noopener">github.com/KalofXeno/sirenum</a></div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/ol@10.2.1/dist/ol.js"></script>
+  <script type="module" src="js/app.js?v=202611062023"></script>
+</body>
+</html>

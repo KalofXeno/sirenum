@@ -290,3 +290,108 @@ select option { background: var(--c-surf); color: var(--c-t1); }
   .pill, .vtog kbd { display: none; }
   .hdr { gap: 12px; padding: 0 12px; }
 }
+
+/* ======================================================================
+   Responsive layout
+   --tl-h is the measured timeline height (set from JS) so map chrome,
+   attribution and sheets always clear it.
+   ====================================================================== */
+:root { --tl-h: 108px; --gap: 14px; --safe-b: env(safe-area-inset-bottom, 0px); --safe-l: env(safe-area-inset-left, 0px); --safe-r: env(safe-area-inset-right, 0px); }
+html, body { height: 100dvh; overflow: hidden; overscroll-behavior: none; }
+.hdr { padding-left: calc(18px + var(--safe-l)); padding-right: calc(18px + var(--safe-r)); }
+.timeline { height: auto; min-height: 108px; bottom: calc(var(--gap) + var(--safe-b)); left: calc(var(--gap) + var(--safe-l)); right: calc(var(--gap) + var(--safe-r)); }
+.cursor-readout { bottom: calc(var(--tl-h) + var(--gap) * 2 + var(--safe-b) + 26px); }
+.ol-attribution { bottom: calc(var(--tl-h) + var(--gap) * 2 + var(--safe-b)) !important; }
+.layers { max-height: calc(100% - var(--hdr-h) - var(--tl-h) - var(--gap) * 4); }
+.details { max-height: calc(100% - var(--hdr-h) - var(--tl-h) - var(--gap) * 4); overflow: auto; }
+.lbl-short, .hint-touch { display: none; }
+.fab, .sheet-close { display: none; }
+
+/* Touch devices: no hover readout, touch-sized targets */
+@media (hover: none) {
+  .cursor-readout { display: none; }
+  .hint-desk { display: none; } .hint-touch { display: inline; }
+  .layer { padding: 9px 6px; }
+  .tl-controls button { width: 40px; height: 40px; }
+  .tl-controls .play { width: 48px; height: 48px; }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .ts { display: none; }
+  .timeline { gap: 16px; padding: 12px 16px; }
+}
+
+/* Phone */
+@media (max-width: 760px) {
+  :root { --hdr-h: 52px; --gap: 10px; }
+  .hdr { gap: 10px; }
+  .brand h1 { font-size: 1.1rem; }
+  .pill, .vtog kbd, .map-hint { display: none; }
+  .vtog button { padding: 6px 11px; }
+  .lbl-long { display: none; } .lbl-short { display: inline; }
+  .btn { padding: 6px 10px; }
+  .theme > span { display: none; }
+
+  /* Layers: floating button opens a sheet */
+  .fab {
+    display: inline-flex; align-items: center; gap: 6px; position: absolute; z-index: 11;
+    top: calc(var(--hdr-h) + var(--gap)); left: calc(var(--gap) + var(--safe-l));
+    padding: 9px 13px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 500;
+    color: var(--c-t1); background: var(--glass); border: 1px solid var(--glass-edge);
+    -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); box-shadow: var(--glass-hi), var(--shadow);
+  }
+  .fab svg { width: 18px; height: 18px; }
+  .layers {
+    top: calc(var(--hdr-h) + var(--gap)); left: calc(var(--gap) + var(--safe-l)); right: calc(var(--gap) + var(--safe-r));
+    width: auto; padding-top: 10px;
+    transform: translateY(-8px) scale(.98); opacity: 0; pointer-events: none;
+    transition: opacity .25s var(--ease), transform .3s var(--ease);
+    animation: none;
+  }
+  .layers.open { transform: none; opacity: 1; pointer-events: auto; }
+  .layers .sheet-close { display: block; }
+  .layers .card-h:first-of-type { margin-top: 2px; }
+
+  /* Details become a sheet above the timeline */
+  .details {
+    top: auto; left: calc(var(--gap) + var(--safe-l)); right: calc(var(--gap) + var(--safe-r)); width: auto;
+    bottom: calc(var(--tl-h) + var(--gap) * 2 + var(--safe-b));
+    max-height: 46dvh;
+  }
+  .details dl { grid-template-columns: auto 1fr; }
+
+  /* Timeline: controls + date on top, Ls strip + slider below */
+  .timeline {
+    grid-template-columns: auto 1fr; grid-template-areas: "ctrl date" "track track";
+    gap: 10px 12px; padding: 10px 12px 12px; min-height: 0;
+  }
+  .tl-controls { grid-area: ctrl; gap: 6px; }
+  .tl-date { grid-area: date; justify-self: end; text-align: right; min-width: 0; }
+  .tl-date input[type="date"] { font-size: 13px; padding: 5px 8px; }
+  .mars-date { justify-content: flex-end; margin-top: 5px; }
+  .mars-date .season { display: none; }
+  .tl-track { grid-area: track; gap: 8px; }
+  .tl-controls select { padding: 5px 24px 5px 8px; background-position: right 8px center; font-size: 11px; margin-left: 0; }
+  .ls-strip { height: 24px; }
+  #day-slider { height: 22px; }
+
+  .ol-attribution li { font-size: 9px; }
+  .shell { padding: calc(var(--hdr-h) + 14px) 12px 14px; }
+  .about .doc { padding: 20px 18px; }
+}
+
+/* Small phones */
+@media (max-width: 400px) {
+  .brand-mark { display: none; }
+  .tl-controls select { display: none; }
+  .vtog button { padding: 6px 9px; font-size: 12px; }
+}
+
+/* Short landscape phones: slimmer timeline */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root { --hdr-h: 46px; }
+  .timeline { grid-template-columns: auto auto 1fr; grid-template-areas: none; padding: 8px 12px; min-height: 0; }
+  .tl-controls, .tl-date, .tl-track { grid-area: auto; }
+  .mars-date .season, .ls-ticks { display: none; }
+}

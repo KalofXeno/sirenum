@@ -168,7 +168,23 @@ const map = new ol.Map({
   }),
 });
 basemaps.mola.setVisible(false);
-map.getView().fit(GLOBAL_EXTENT, { padding: [20, 20, 130, 280] });
+// ---------- Responsive helpers ----------
+const phone = window.matchMedia("(max-width: 760px)");
+
+function fitPadding() {
+  const css = getComputedStyle(document.documentElement);
+  const hdr = parseFloat(css.getPropertyValue("--hdr-h")) || 58;
+  const tl = $("view-map").querySelector(".timeline").offsetHeight || 108;
+  const left = phone.matches ? 12 : 290;
+  return [hdr + 16, 16, tl + 28, left];
+}
+
+// Keep --tl-h in sync with the real timeline height (it wraps on small screens).
+new ResizeObserver(([e]) => {
+  document.documentElement.style.setProperty("--tl-h", `${Math.round(e.target.offsetHeight)}px`);
+}).observe(document.querySelector(".timeline"));
+
+map.getView().fit(GLOBAL_EXTENT, { padding: fitPadding() });
 
 // ---------- Formatting ----------
 function fmtLon(lon) {
@@ -352,6 +368,18 @@ function wire() {
   });
 
   document.querySelectorAll("[data-view]").forEach((t) => t.addEventListener("click", () => showView(t.dataset.view)));
+
+  // Phone: layers open as a sheet from a floating button.
+  const setLayers = (open) => {
+    $("layers").classList.toggle("open", open);
+    $("layers-btn").setAttribute("aria-expanded", String(open));
+    if (open) $("details").classList.add("hidden");
+  };
+  $("layers-btn").addEventListener("click", () => setLayers(!$("layers").classList.contains("open")));
+  $("layers-close").addEventListener("click", () => setLayers(false));
+  map.on("pointerdown", () => phone.matches && setLayers(false));
+  phone.addEventListener("change", () => { setLayers(false); map.updateSize(); });
+  window.addEventListener("resize", () => map.updateSize());
 
   $("theme-tog").addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";

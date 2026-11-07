@@ -2,7 +2,8 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#090d0e" />
   <title>Sirenum · MARCI Daily Global Maps</title>
   <script>
     // Set theme before paint to avoid a flash.
@@ -17,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/app.css?v=202611062023" />
+  <link rel="stylesheet" href="css/app.css?v=202611062238" />
 </head>
 <body>
   <header class="hdr">
@@ -35,7 +36,7 @@
     </nav>
     <div class="hdr-right">
       <span class="ts" id="ts"></span>
-      <button id="share" class="btn" title="Copy a link to this view">Copy link</button>
+      <button id="share" class="btn" title="Copy a link to this view"><span class="lbl-long">Copy link</span><span class="lbl-short">Link</span></button>
       <div class="theme" title="Toggle light / dark">
         <span>☾</span>
         <button class="tog" id="theme-tog" aria-label="Toggle light or dark theme"></button>
@@ -45,7 +46,12 @@
   </header>
 
   <main id="view-map" class="view active">
-    <aside class="card layers ani ani-1" aria-label="Layers">
+    <button id="layers-btn" class="fab" aria-controls="layers" aria-expanded="false" title="Layers">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Zm-10 9 10 5 10-5M2 16l10 5 10-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span>Layers</span>
+    </button>
+    <aside id="layers" class="card layers ani ani-1" aria-label="Layers">
+      <button class="close sheet-close" id="layers-close" aria-label="Close layers">×</button>
       <div class="card-h"><span class="ico teal">◐</span><h3>Daily</h3></div>
       <label class="layer">
         <input type="checkbox" id="lyr-mdgm" checked />
@@ -75,7 +81,7 @@
     </aside>
 
     <div id="map" class="map"></div>
-    <div class="map-hint">Scroll to zoom · drag to pan · click for details · ← → step days · space to play</div>
+    <div class="map-hint"><span class="hint-desk">Scroll to zoom · drag to pan · click for details · ← → step days · space to play</span><span class="hint-touch">Pinch to zoom · tap for details</span></div>
     <div id="cursor" class="cursor-readout"></div>
 
     <aside id="details" class="card details hidden" aria-label="Location details">
@@ -147,6 +153,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/ol@10.2.1/dist/ol.js"></script>
-  <script type="module" src="js/app.js?v=202611062023"></script>
+  <script type="module" src="js/app.js?v=202611062238"></script>
 </body>
 </html>

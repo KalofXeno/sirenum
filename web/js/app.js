@@ -260,7 +260,8 @@ function render() {
   const phase = phaseFor(m.ls);
 
   // info card
-  $("info-eyebrow").textContent = `MY ${m.my} · Ls ${m.ls.toFixed(1)}° · ${m.season}`;
+  $("info-eyebrow").textContent = `MY ${m.my} · Ls ${m.ls.toFixed(1)}°`;
+  $("info").title = m.season;
   $("info-dot").style.background = phase.c;
   $("info-title").textContent = day ? `${phase.name} · ${dayLabel(day) || isoDate(state.date)}` : `${phase.name} · no map yet`;
   $("info-text").textContent = day

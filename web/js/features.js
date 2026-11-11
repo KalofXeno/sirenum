@@ -1,17 +1,18 @@
 // Reference features. Planetocentric latitude, east-positive longitude in -180..180.
-// Landing site coordinates are approximate (to ~0.1 deg), sufficient for a 0.1 deg/px daily map.
+// Landing coordinates are approximate (~0.1 deg), plenty for a 0.1 deg/px daily map.
+// landed / ended are UTC dates (ended = last contact; null = still active).
 
 export const LANDING_SITES = [
-  { name: "Viking 1", lat: 22.27, lon: -47.95, year: 1976, agency: "NASA" },
-  { name: "Viking 2", lat: 47.64, lon: 134.29, year: 1976, agency: "NASA" },
-  { name: "Mars Pathfinder", lat: 19.13, lon: -33.22, year: 1997, agency: "NASA" },
-  { name: "Spirit (MER-A)", lat: -14.57, lon: 175.47, year: 2004, agency: "NASA" },
-  { name: "Opportunity (MER-B)", lat: -1.95, lon: -5.53, year: 2004, agency: "NASA" },
-  { name: "Phoenix", lat: 68.22, lon: -125.75, year: 2008, agency: "NASA" },
-  { name: "Curiosity (MSL)", lat: -4.59, lon: 137.44, year: 2012, agency: "NASA" },
-  { name: "InSight", lat: 4.5, lon: 135.62, year: 2018, agency: "NASA" },
-  { name: "Perseverance (M2020)", lat: 18.44, lon: 77.45, year: 2021, agency: "NASA" },
-  { name: "Zhurong", lat: 25.07, lon: 109.93, year: 2021, agency: "CNSA" },
+  { name: "Viking 1", lat: 22.27, lon: -47.95, landed: "1976-07-20", ended: "1982-11-11", agency: "NASA" },
+  { name: "Viking 2", lat: 47.64, lon: 134.29, landed: "1976-09-03", ended: "1980-04-11", agency: "NASA" },
+  { name: "Mars Pathfinder", lat: 19.13, lon: -33.22, landed: "1997-07-04", ended: "1997-09-27", agency: "NASA" },
+  { name: "Spirit", lat: -14.57, lon: 175.47, landed: "2004-01-04", ended: "2010-03-22", agency: "NASA" },
+  { name: "Opportunity", lat: -1.95, lon: -5.53, landed: "2004-01-25", ended: "2018-06-10", agency: "NASA" },
+  { name: "Phoenix", lat: 68.22, lon: -125.75, landed: "2008-05-25", ended: "2008-11-02", agency: "NASA" },
+  { name: "Curiosity", lat: -4.59, lon: 137.44, landed: "2012-08-06", ended: null, agency: "NASA" },
+  { name: "InSight", lat: 4.5, lon: 135.62, landed: "2018-11-26", ended: "2022-12-15", agency: "NASA" },
+  { name: "Perseverance", lat: 18.44, lon: 77.45, landed: "2021-02-18", ended: null, agency: "NASA" },
+  { name: "Zhurong", lat: 25.07, lon: 109.93, landed: "2021-05-14", ended: "2022-05-20", agency: "CNSA" },
 ];
 
 export const REGIONS = [
@@ -29,7 +30,7 @@ export const REGIONS = [
   { name: "Amazonis Planitia", lat: 24.8, lon: -163.7 },
   { name: "Chryse Planitia", lat: 28.4, lon: -40.2 },
   { name: "Noachis Terra", lat: -45, lon: -10 },
-  { name: "Planum Boreum", lat: 88, lon: 15 },
+  { name: "Planum Boreum", lat: 85, lon: 15 },
   { name: "Planum Australe", lat: -83.9, lon: 160 },
 ];
 

@@ -182,7 +182,8 @@ const dayLabel = (d) => (d?.subphase ? `${d.subphase}${d.day ? ` · Day ${String
 const yearCache = new Map();
 function marsYearDays(my) {
   if (!yearCache.has(my)) {
-    const approxStart = parseDate("1955-04-11").getTime() + (my - 1) * 686.9726 * DAY;
+    const approx = parseDate("1955-04-11").getTime() + (my - 1) * 686.9726 * DAY;
+    const approxStart = Math.floor(approx / DAY) * DAY; // align to UTC midnight, like state.date
     const out = [];
     for (let t = approxStart - 8 * DAY; t < approxStart + 700 * DAY; t += DAY) {
       const d = new Date(t);
